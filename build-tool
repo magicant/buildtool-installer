@@ -1,0 +1,63 @@
+#!/bin/bash
+
+usage() {
+  cat <<EOF >&2
+極力環境を汚さないようにビルドツールをインストールし、実行します。
+Usage:
+  $0 <COMMAND> ...
+
+Supported Tools:
+  - Rust Language
+      rustup / cargo / rustc
+EOF
+  exit 1
+}
+
+install_rustup() {
+  : "${PREFIX?not defined}"
+  export RUSTUP_HOME="$PREFIX"
+  export CARGO_HOME="$PREFIX"
+  if [ -x "$PREFIX/bin/rustup" ]; then
+    "$PREFIX/bin/rustup" self update
+  else
+    # refs https://rustup.rs/
+    curl https://sh.rustup.rs -sSf | sh -s -- --no-modify-path -y --default-toolchain none
+  fi
+}
+
+install_rust_toolchain() {
+  : "${RUST_VERSION?not defined}"
+  install_rustup
+  "$PREFIX/bin/rustup" toolchain install "$RUST_VERSION"
+}
+
+while [ "$#" != 0 ]; do
+  case "$1" in
+    -- )
+      shift
+      break ;;
+    --* )
+      echo "Option \`${1}\` is not supported." >&1
+      exit 1 ;;
+    * ) break
+  esac
+  shift
+done
+
+[ "$#" = 0 ] && usage
+
+cmd="$1"
+shift
+case "$cmd" in
+  help )
+    usage ;;
+  rustup )
+    install_rustup
+    "$PREFIX/bin/$cmd" "$@" ;;
+  cargo | rustc )
+    install_rust_toolchain
+    "$PREFIX/bin/rustup" run "$RUST_VERSION" "$cmd" "$@" ;;
+  * )
+    echo "\`$cmd\` is not supported." >&2
+    exit 1
+esac
