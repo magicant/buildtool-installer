@@ -55,13 +55,21 @@ install_go() {
 install_opam() {
   : "${PREFIX?not defined}"
   export OPAMROOT="$PREFIX/opam"
-  if [ ! -x "$PREFIX/bin/opam" ]; then
-    mkdir -p "$PREFIX/bin"
-    curl -L -o "$PREFIX/bin/opam.tmp" \
-      "https://github.com/ocaml/opam/releases/download/${DEFAULT_OPAM_VERSION}/opam-${DEFAULT_OPAM_VERSION}-x86_64-darwin"
-    chmod +x "$PREFIX/bin/opam.tmp"
-    mv "$PREFIX/bin/opam.tmp" "$PREFIX/bin/opam"
-  fi
+  [ -x "$PREFIX/bin/opam" ] && return
+
+  mkdir -p "$PREFIX/bin"
+  case $(uname) in
+    Linux )
+      fname="opam-${DEFAULT_OPAM_VERSION}-x86_64-linux" ;;
+    Darwin )
+      fname="opam-${DEFAULT_OPAM_VERSION}-x86_64-darwin" ;;
+    * )
+      echo "$(uname) is not supported." >&2
+      exit 1
+  esac
+  curl -L -o "$PREFIX/bin/opam.tmp" "https://github.com/ocaml/opam/releases/download/${DEFAULT_OPAM_VERSION}/$fname"
+  chmod +x "$PREFIX/bin/opam.tmp"
+  mv "$PREFIX/bin/opam.tmp" "$PREFIX/bin/opam"
   # --bare     : コンパイラをまだインストールしない
   # --no-setup : .profileなどを変更しない
   "$PREFIX/bin/opam" init --bare --no-setup
