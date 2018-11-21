@@ -5,20 +5,19 @@
 ## サポートするツール
 
 - Rust
-    - `rustup`
-    - `cargo`
-    - `rustc`
+- OCaml
+- Rust
 
 ## 利用方法
 
 例えば次のコマンドでRustコンパイラのインストールから実行までを自動的に行います。
 
 ```bash
-PREFIX=tmp RUST_VERSION=2.30.1 build-tool rustc main.rs
+build-tool --prefix=tmp --rust-version=2.30.1 rustc main.rs
 ```
 
-- `PREFIX`: ツールをインストールするディレクトリを指定してください。
-- `RUST_VERSION`: Rustのバージョンを指定してください。
+- `--prefix`: ツールをインストールするディレクトリを指定してください。
+- `--rust-version`: Rustのバージョンを指定してください。
 
 ## プラットフォーム
 
