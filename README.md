@@ -4,7 +4,7 @@
 
 ## サポートするツール
 
-- Rust
+- Go
 - OCaml
 - Rust
 
